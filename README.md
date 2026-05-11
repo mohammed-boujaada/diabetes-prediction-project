@@ -369,3 +369,4 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 **Version**: 1.0.0
 
 ⭐ If you found this project useful, please consider giving it a star!
+
