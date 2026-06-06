@@ -26,11 +26,6 @@ diabetes-prediction-project/
 ├── dataset/
 │   └── dataset_diabet.csv              # Main diabetes dataset
 │
-├── notebooks/
-│   ├── 01_data_exploration.ipynb       # EDA and data analysis
-│   ├── 02_model_training.ipynb         # Model training and optimization
-│   └── 03_results_analysis.ipynb       # Results visualization and analysis
-│
 ├── src/
 │   ├── __init__.py                     # Package initialization
 │   ├── data_preprocessing.py           # Data loading and preprocessing
@@ -45,11 +40,7 @@ diabetes-prediction-project/
 │   ├── model_comparison.csv           # Model performance metrics
 │   └── detailed_metrics.csv           # Detailed evaluation metrics
 │
-├── images/
-│   ├── confusion_matrices.png         # Confusion matrices visualization
-│   ├── roc_curves.png                 # ROC curves for all models
-│   └── feature_importance.png         # Feature importance plot
-│
+├── LICENSE  
 ├── requirements.txt                   # Python dependencies
 ├── setup.py                          # Package setup configuration
 ├── .gitignore                        # Git ignore rules
