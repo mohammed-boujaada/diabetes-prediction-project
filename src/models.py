@@ -1,269 +1,407 @@
 """
 Machine Learning Models Module
-
-This module implements various machine learning models for diabetes prediction.
+Contains implementations of KNN, Random Forest, and Decision Tree classifiers.
 """
 
-import logging
+import pickle
 import numpy as np
-import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-
-logger = logging.getLogger(__name__)
+from sklearn.metrics import accuracy_score, classification_report
+import warnings
+warnings.filterwarnings('ignore')
 
 
 class KNNModel:
     """
-    K-Nearest Neighbors model for diabetes prediction.
-    
-    Attributes:
-        model: Trained KNN classifier
-        best_k: Best number of neighbors found during optimization
-        pipeline: Complete preprocessing + model pipeline
+    K-Nearest Neighbors classifier with hyperparameter optimization.
     """
     
-    def __init__(self, n_neighbors: int = 5):
+    def __init__(self, n_neighbors=5, weights='uniform', algorithm='auto'):
         """
         Initialize KNN model.
         
-        Args:
-            n_neighbors (int): Number of neighbors to use (default: 5)
+        Parameters:
+        -----------
+        n_neighbors : int
+            Number of neighbors (default: 5)
+        weights : str
+            Weight function used in prediction ('uniform' or 'distance')
+        algorithm : str
+            Algorithm used to compute the nearest neighbors
         """
-        self.model = KNeighborsClassifier(n_neighbors=n_neighbors)
-        self.best_k = n_neighbors
-        self.pipeline = None
-        logger.info(f"KNN model initialized with n_neighbors={n_neighbors}")
+        self.n_neighbors = n_neighbors
+        self.weights = weights
+        self.algorithm = algorithm
+        self.model = KNeighborsClassifier(
+            n_neighbors=n_neighbors,
+            weights=weights,
+            algorithm=algorithm
+        )
+        self.is_trained = False
+        self.best_params = None
     
     def train(self, X_train, y_train):
         """
         Train the KNN model.
         
-        Args:
-            X_train: Training features (should be scaled)
-            y_train: Training target variable
-        
-        Returns:
-            self: Fitted model
+        Parameters:
+        -----------
+        X_train : array-like
+            Training features
+        y_train : array-like
+            Training labels
         """
+        print(f"\n🔧 Training KNN model (k={self.n_neighbors})...")
         self.model.fit(X_train, y_train)
-        logger.info("KNN model trained successfully")
-        return self
+        self.is_trained = True
+        print(f"✓ KNN model trained successfully")
     
-    def predict(self, X_test):
+    def optimize(self, X_train, y_train, param_grid=None, cv=5):
         """
-        Make predictions on test data.
+        Optimize hyperparameters using GridSearchCV.
         
-        Args:
-            X_test: Test features (should be scaled)
-        
+        Parameters:
+        -----------
+        X_train : array-like
+            Training features
+        y_train : array-like
+            Training labels
+        param_grid : dict
+            Parameter grid for optimization
+        cv : int
+            Number of cross-validation folds
+            
         Returns:
-            np.array: Predictions
+        --------
+        dict
+            Best parameters found
         """
-        predictions = self.model.predict(X_test)
-        return predictions
-    
-    def predict_proba(self, X_test):
-        """
-        Get prediction probabilities.
+        if param_grid is None:
+            param_grid = {
+                'n_neighbors': list(range(1, 31, 2)),
+                'weights': ['uniform', 'distance'],
+                'algorithm': ['auto', 'ball_tree', 'kd_tree', 'brute']
+            }
         
-        Args:
-            X_test: Test features (should be scaled)
+        print(f"\n🔍 Optimizing KNN hyperparameters with GridSearchCV...")
+        print(f"   Parameter grid: {param_grid}")
+        print(f"   Cross-validation folds: {cv}")
         
-        Returns:
-            np.array: Prediction probabilities
-        """
-        return self.model.predict_proba(X_test)
-    
-    def optimize_k(self, X_train, y_train, X_test, y_test, k_range: range):
-        """
-        Find the optimal number of neighbors using GridSearchCV.
+        grid_search = GridSearchCV(
+            KNeighborsClassifier(),
+            param_grid,
+            cv=cv,
+            scoring='f1',
+            n_jobs=-1,
+            verbose=1
+        )
         
-        Args:
-            X_train: Training features
-            y_train: Training target
-            X_test: Test features
-            y_test: Test target
-            k_range (range): Range of k values to test
-        
-        Returns:
-            dict: Results with best k and scores
-        """
-        logger.info(f"Optimizing KNN with k range {k_range}")
-        
-        # Create pipeline
-        scaler = StandardScaler()
-        knn = KNeighborsClassifier()
-        pipeline = Pipeline([('scaler', scaler), ('knn', knn)])
-        
-        # Grid search
-        param_grid = {'knn__n_neighbors': list(k_range)}
-        grid_search = GridSearchCV(pipeline, param_grid, cv=5, scoring='accuracy')
         grid_search.fit(X_train, y_train)
         
-        self.best_k = grid_search.best_params_['knn__n_neighbors']
-        self.pipeline = grid_search.best_estimator_
-        self.model = grid_search.best_estimator_.named_steps['knn']
+        self.model = grid_search.best_estimator_
+        self.best_params = grid_search.best_params_
+        self.is_trained = True
         
-        logger.info(f"Best k value: {self.best_k}")
-        logger.info(f"Best cross-validation score: {grid_search.best_score_:.4f}")
+        print(f"\n✓ Best parameters found: {self.best_params}")
+        print(f"  Best F1-score: {grid_search.best_score_:.4f}")
         
-        return {
-            'best_k': self.best_k,
-            'best_score': grid_search.best_score_,
-            'test_score': grid_search.score(X_test, y_test),
-            'all_results': grid_search.cv_results_
-        }
+        return self.best_params
+    
+    def predict(self, X):
+        """
+        Make predictions.
+        
+        Parameters:
+        -----------
+        X : array-like
+            Features to predict
+            
+        Returns:
+        --------
+        array
+            Predicted labels
+        """
+        if not self.is_trained:
+            raise ValueError("Model must be trained before making predictions")
+        return self.model.predict(X)
+    
+    def predict_proba(self, X):
+        """
+        Predict class probabilities.
+        
+        Parameters:
+        -----------
+        X : array-like
+            Features to predict
+            
+        Returns:
+        --------
+        array
+            Class probabilities
+        """
+        if not self.is_trained:
+            raise ValueError("Model must be trained before making predictions")
+        return self.model.predict_proba(X)
+    
+    def score(self, X, y):
+        """
+        Calculate accuracy score.
+        
+        Parameters:
+        -----------
+        X : array-like
+            Test features
+        y : array-like
+            True labels
+            
+        Returns:
+        --------
+        float
+            Accuracy score
+        """
+        if not self.is_trained:
+            raise ValueError("Model must be trained before scoring")
+        return self.model.score(X, y)
+    
+    def save(self, filepath):
+        """
+        Save the trained model to a file.
+        
+        Parameters:
+        -----------
+        filepath : str
+            Path to save the model
+        """
+        if not self.is_trained:
+            raise ValueError("Model must be trained before saving")
+        
+        with open(filepath, 'wb') as f:
+            pickle.dump(self.model, f)
+        print(f"✓ KNN model saved to {filepath}")
+    
+    @staticmethod
+    def load(filepath):
+        """
+        Load a trained model from a file.
+        
+        Parameters:
+        -----------
+        filepath : str
+            Path to the model file
+            
+        Returns:
+        --------
+        KNeighborsClassifier
+            Loaded model
+        """
+        with open(filepath, 'rb') as f:
+            model = pickle.load(f)
+        print(f"✓ KNN model loaded from {filepath}")
+        return model
 
 
 class RandomForestModel:
     """
-    Random Forest model for diabetes prediction.
-    
-    Attributes:
-        model: Trained Random Forest classifier
+    Random Forest classifier with feature importance tracking.
     """
     
-    def __init__(self, n_estimators: int = 100, random_state: int = 42, **kwargs):
+    def __init__(self, n_estimators=100, max_depth=10, random_state=42):
         """
         Initialize Random Forest model.
         
-        Args:
-            n_estimators (int): Number of trees (default: 100)
-            random_state (int): Random seed (default: 42)
-            **kwargs: Additional parameters for RandomForestClassifier
+        Parameters:
+        -----------
+        n_estimators : int
+            Number of trees in the forest
+        max_depth : int
+            Maximum depth of the trees
+        random_state : int
+            Random seed for reproducibility
         """
+        self.n_estimators = n_estimators
+        self.max_depth = max_depth
+        self.random_state = random_state
         self.model = RandomForestClassifier(
             n_estimators=n_estimators,
+            max_depth=max_depth,
             random_state=random_state,
-            **kwargs
+            n_jobs=-1
         )
-        logger.info(f"Random Forest model initialized with {n_estimators} estimators")
+        self.is_trained = False
+        self.feature_importances_ = None
     
-    def train(self, X_train, y_train):
+    def train(self, X_train, y_train, feature_names=None):
         """
         Train the Random Forest model.
         
-        Args:
-            X_train: Training features
-            y_train: Training target variable
-        
-        Returns:
-            self: Fitted model
+        Parameters:
+        -----------
+        X_train : array-like
+            Training features
+        y_train : array-like
+            Training labels
+        feature_names : list
+            Names of the features
         """
+        print(f"\n🔧 Training Random Forest model...")
+        print(f"   n_estimators: {self.n_estimators}")
+        print(f"   max_depth: {self.max_depth}")
+        
         self.model.fit(X_train, y_train)
-        logger.info("Random Forest model trained successfully")
-        return self
+        self.is_trained = True
+        self.feature_importances_ = self.model.feature_importances_
+        
+        print(f"✓ Random Forest model trained successfully")
+        
+        if feature_names:
+            self._print_feature_importance(feature_names)
     
-    def predict(self, X_test):
+    def _print_feature_importance(self, feature_names, top_n=5):
         """
-        Make predictions on test data.
+        Print top feature importances.
         
-        Args:
-            X_test: Test features
-        
-        Returns:
-            np.array: Predictions
+        Parameters:
+        -----------
+        feature_names : list
+            Names of the features
+        top_n : int
+            Number of top features to display
         """
-        predictions = self.model.predict(X_test)
-        return predictions
+        importance_df = sorted(
+            zip(feature_names, self.feature_importances_),
+            key=lambda x: x[1],
+            reverse=True
+        )
+        
+        print(f"\n📊 Top {top_n} Feature Importances:")
+        for i, (feature, importance) in enumerate(importance_df[:top_n], 1):
+            print(f"  {i}. {feature}: {importance:.4f} ({importance*100:.2f}%)")
     
-    def predict_proba(self, X_test):
+    def get_feature_importance(self, feature_names=None):
         """
-        Get prediction probabilities.
+        Get feature importances as a dictionary.
         
-        Args:
-            X_test: Test features
-        
+        Parameters:
+        -----------
+        feature_names : list
+            Names of the features
+            
         Returns:
-            np.array: Prediction probabilities
+        --------
+        dict
+            Feature importances
         """
-        return self.model.predict_proba(X_test)
+        if not self.is_trained:
+            raise ValueError("Model must be trained before getting feature importance")
+        
+        if feature_names is None:
+            feature_names = [f"Feature_{i}" for i in range(len(self.feature_importances_))]
+        
+        return dict(zip(feature_names, self.feature_importances_))
     
-    def get_feature_importance(self, feature_names: list) -> pd.DataFrame:
-        """
-        Get feature importance scores.
+    def predict(self, X):
+        """Make predictions."""
+        if not self.is_trained:
+            raise ValueError("Model must be trained before making predictions")
+        return self.model.predict(X)
+    
+    def predict_proba(self, X):
+        """Predict class probabilities."""
+        if not self.is_trained:
+            raise ValueError("Model must be trained before making predictions")
+        return self.model.predict_proba(X)
+    
+    def score(self, X, y):
+        """Calculate accuracy score."""
+        if not self.is_trained:
+            raise ValueError("Model must be trained before scoring")
+        return self.model.score(X, y)
+    
+    def save(self, filepath):
+        """Save the trained model to a file."""
+        if not self.is_trained:
+            raise ValueError("Model must be trained before saving")
         
-        Args:
-            feature_names (list): List of feature names
-        
-        Returns:
-            pd.DataFrame: Feature importance dataframe sorted by importance
-        """
-        importance_df = pd.DataFrame({
-            'feature': feature_names,
-            'importance': self.model.feature_importances_
-        }).sort_values('importance', ascending=False)
-        
-        logger.info("Feature importance retrieved")
-        return importance_df
+        with open(filepath, 'wb') as f:
+            pickle.dump(self.model, f)
+        print(f"✓ Random Forest model saved to {filepath}")
+    
+    @staticmethod
+    def load(filepath):
+        """Load a trained model from a file."""
+        with open(filepath, 'rb') as f:
+            model = pickle.load(f)
+        print(f"✓ Random Forest model loaded from {filepath}")
+        return model
 
 
 class DecisionTreeModel:
     """
-    Decision Tree model for diabetes prediction.
-    
-    Attributes:
-        model: Trained Decision Tree classifier
+    Decision Tree classifier as an interpretable baseline.
     """
     
-    def __init__(self, random_state: int = 42, **kwargs):
+    def __init__(self, max_depth=10, random_state=42):
         """
         Initialize Decision Tree model.
         
-        Args:
-            random_state (int): Random seed (default: 42)
-            **kwargs: Additional parameters for DecisionTreeClassifier
+        Parameters:
+        -----------
+        max_depth : int
+            Maximum depth of the tree
+        random_state : int
+            Random seed for reproducibility
         """
-        self.model = DecisionTreeClassifier(random_state=random_state, **kwargs)
-        logger.info("Decision Tree model initialized")
+        self.max_depth = max_depth
+        self.random_state = random_state
+        self.model = DecisionTreeClassifier(
+            max_depth=max_depth,
+            random_state=random_state
+        )
+        self.is_trained = False
     
     def train(self, X_train, y_train):
-        """
-        Train the Decision Tree model.
+        """Train the Decision Tree model."""
+        print(f"\n🔧 Training Decision Tree model...")
+        print(f"   max_depth: {self.max_depth}")
         
-        Args:
-            X_train: Training features
-            y_train: Training target variable
-        
-        Returns:
-            self: Fitted model
-        """
         self.model.fit(X_train, y_train)
-        logger.info("Decision Tree model trained successfully")
-        return self
+        self.is_trained = True
+        print(f"✓ Decision Tree model trained successfully")
     
-    def predict(self, X_test):
-        """
-        Make predictions on test data.
-        
-        Args:
-            X_test: Test features
-        
-        Returns:
-            np.array: Predictions
-        """
-        predictions = self.model.predict(X_test)
-        return predictions
+    def predict(self, X):
+        """Make predictions."""
+        if not self.is_trained:
+            raise ValueError("Model must be trained before making predictions")
+        return self.model.predict(X)
     
-    def get_feature_importance(self, feature_names: list) -> pd.DataFrame:
-        """
-        Get feature importance scores.
+    def predict_proba(self, X):
+        """Predict class probabilities."""
+        if not self.is_trained:
+            raise ValueError("Model must be trained before making predictions")
+        return self.model.predict_proba(X)
+    
+    def score(self, X, y):
+        """Calculate accuracy score."""
+        if not self.is_trained:
+            raise ValueError("Model must be trained before scoring")
+        return self.model.score(X, y)
+    
+    def save(self, filepath):
+        """Save the trained model to a file."""
+        if not self.is_trained:
+            raise ValueError("Model must be trained before saving")
         
-        Args:
-            feature_names (list): List of feature names
-        
-        Returns:
-            pd.DataFrame: Feature importance dataframe sorted by importance
-        """
-        importance_df = pd.DataFrame({
-            'feature': feature_names,
-            'importance': self.model.feature_importances_
-        }).sort_values('importance', ascending=False)
-        
-        logger.info("Feature importance retrieved")
-        return importance_df
+        with open(filepath, 'wb') as f:
+            pickle.dump(self.model, f)
+        print(f"✓ Decision Tree model saved to {filepath}")
+    
+    @staticmethod
+    def load(filepath):
+        """Load a trained model from a file."""
+        with open(filepath, 'rb') as f:
+            model = pickle.load(f)
+        print(f"✓ Decision Tree model loaded from {filepath}")
+        return model
