@@ -13,7 +13,7 @@ import pickle
 import pandas as pd
 from data_preprocessing import preprocess_pipeline
 from models import KNNModel, RandomForestModel
-from evaluation import calculate_metrics, print_classification_report, print_metrics_summary
+from evaluation import calculate_metrics, print_classification_report
 
 
 def example_1_train_from_scratch():
@@ -33,24 +33,24 @@ def example_1_train_from_scratch():
     knn_pred = knn.predict(prep_data['scaled_X_test'])
     knn_metrics = calculate_metrics(prep_data['y_test'], knn_pred)
     
-    print(f"\nKNN Results:")
-    print(f"  Accuracy: {knn_metrics['accuracy']:.4f}")
+    print("\nKNN Results:")
+    print(f"  Accuracy:  {knn_metrics['accuracy']:.4f}")
     print(f"  Precision: {knn_metrics['precision']:.4f}")
-    print(f"  Recall: {knn_metrics['recall']:.4f}")
-    print(f"  F1-Score: {knn_metrics['f1']:.4f}")
+    print(f"  Recall:    {knn_metrics['recall']:.4f}")
+    print(f"  F1-Score:  {knn_metrics['f1_score']:.4f}")
     
     # Train Random Forest
     print("\nStep 3: Training Random Forest model...")
     rf = RandomForestModel(n_estimators=100, random_state=42)
-    rf.train(prep_data['X_train'], prep_data['y_train'])
-    rf_pred = rf.predict(prep_data['X_test'])
+    rf.train(prep_data['scaled_X_train'], prep_data['y_train'])
+    rf_pred = rf.predict(prep_data['scaled_X_test'])
     rf_metrics = calculate_metrics(prep_data['y_test'], rf_pred)
     
-    print(f"\nRandom Forest Results:")
-    print(f"  Accuracy: {rf_metrics['accuracy']:.4f}")
+    print("\nRandom Forest Results:")
+    print(f"  Accuracy:  {rf_metrics['accuracy']:.4f}")
     print(f"  Precision: {rf_metrics['precision']:.4f}")
-    print(f"  Recall: {rf_metrics['recall']:.4f}")
-    print(f"  F1-Score: {rf_metrics['f1']:.4f}")
+    print(f"  Recall:    {rf_metrics['recall']:.4f}")
+    print(f"  F1-Score:  {rf_metrics['f1_score']:.4f}")
     
     return prep_data, knn, rf
 
@@ -74,19 +74,19 @@ def example_2_load_trained_models():
     with open(os.path.join(models_dir, 'random_forest.pkl'), 'rb') as f:
         rf_model = pickle.load(f)
     
-    print("✓ Models loaded successfully!\n")
+    print("[OK] Models loaded successfully!\n")
     
     # Make predictions
     print("Making predictions...")
-    knn_pred = knn_model.predict(prep_data['X_test'])
-    rf_pred = rf_model.predict(prep_data['X_test'])
+    knn_pred = knn_model.predict(prep_data['scaled_X_test'])
+    rf_pred = rf_model.predict(prep_data['scaled_X_test'])
     
     # Evaluate
     knn_metrics = calculate_metrics(prep_data['y_test'], knn_pred)
     rf_metrics = calculate_metrics(prep_data['y_test'], rf_pred)
     
-    print(f"\nKNN Performance: Accuracy={knn_metrics['accuracy']:.4f}, F1={knn_metrics['f1']:.4f}")
-    print(f"Random Forest Performance: Accuracy={rf_metrics['accuracy']:.4f}, F1={rf_metrics['f1']:.4f}")
+    print(f"\nKNN Performance:           Accuracy={knn_metrics['accuracy']:.4f}, F1={knn_metrics['f1_score']:.4f}")
+    print(f"Random Forest Performance: Accuracy={rf_metrics['accuracy']:.4f}, F1={rf_metrics['f1_score']:.4f}")
     
     return prep_data, knn_model, rf_model
 
@@ -97,12 +97,15 @@ def example_3_predict_single_patient():
     print("EXAMPLE 3: Single Patient Prediction")
     print("="*70 + "\n")
     
-    # Load trained model
+    # Load trained model and scaler
     with open('results/knn_optimized.pkl', 'rb') as f:
         knn_model = pickle.load(f)
     
     with open('results/random_forest.pkl', 'rb') as f:
         rf_model = pickle.load(f)
+    
+    with open('results/scaler.pkl', 'rb') as f:
+        scaler = pickle.load(f)
     
     # Create patient data
     patient_data = pd.DataFrame({
@@ -117,7 +120,10 @@ def example_3_predict_single_patient():
     })
     
     print("Patient Information:")
-    print(patient_data.to_string(index=False))
+    print(patient_data.T.to_string(header=False))
+    
+    # Scale the patient data
+    scaled_patient = scaler.transform(patient_data)
     
     # Make predictions
     print("\n" + "-"*70)
@@ -125,27 +131,27 @@ def example_3_predict_single_patient():
     print("-"*70 + "\n")
     
     # KNN prediction
-    knn_pred = knn_model.predict(patient_data)
-    knn_proba = knn_model.predict_proba(patient_data)
+    knn_pred = knn_model.predict(scaled_patient)
+    knn_proba = knn_model.predict_proba(scaled_patient)
     
     print("KNN (Optimized) Model:")
-    print(f"  Prediction: {'DIABETES RISK DETECTED' if knn_pred[0] == 1 else 'NO DIABETES'}")
-    print(f"  Confidence: {max(knn_proba[0]):.2%}")
+    print(f"  Prediction:          {'DIABETES RISK DETECTED' if knn_pred[0] == 1 else 'NO DIABETES'}")
+    print(f"  Confidence:          {max(knn_proba[0]):.2%}")
     print(f"  Diabetes Probability: {knn_proba[0][1]:.2%}")
     
     # Random Forest prediction
-    rf_pred = rf_model.predict(patient_data)
-    rf_proba = rf_model.predict_proba(patient_data)
+    rf_pred = rf_model.predict(scaled_patient)
+    rf_proba = rf_model.predict_proba(scaled_patient)
     
     print("\nRandom Forest Model:")
-    print(f"  Prediction: {'DIABETES RISK DETECTED' if rf_pred[0] == 1 else 'NO DIABETES'}")
-    print(f"  Confidence: {max(rf_proba[0]):.2%}")
+    print(f"  Prediction:          {'DIABETES RISK DETECTED' if rf_pred[0] == 1 else 'NO DIABETES'}")
+    print(f"  Confidence:          {max(rf_proba[0]):.2%}")
     print(f"  Diabetes Probability: {rf_proba[0][1]:.2%}")
     
     # Ensemble decision
-    ensemble_pred = (knn_pred[0] + rf_pred[0]) / 2
-    print("\nEnsemble Decision (Average):")
-    print(f"  Score: {ensemble_pred:.2f}")
+    ensemble_pred = (knn_proba[0][1] + rf_proba[0][1]) / 2
+    print("\nEnsemble Decision (Average Probability):")
+    print(f"  Score:          {ensemble_pred:.2%}")
     print(f"  Recommendation: {'CONSULT HEALTHCARE PROVIDER' if ensemble_pred >= 0.5 else 'NO IMMEDIATE CONCERN'}")
 
 
@@ -174,16 +180,16 @@ def example_4_compare_models():
     # Train Random Forest
     print("Training Random Forest...")
     rf = RandomForestModel()
-    rf.train(prep_data['X_train'], prep_data['y_train'])
-    rf_pred = rf.predict(prep_data['X_test'])
+    rf.train(prep_data['scaled_X_train'], prep_data['y_train'])
+    rf_pred = rf.predict(prep_data['scaled_X_test'])
     results['Random Forest'] = calculate_metrics(prep_data['y_test'], rf_pred)
     models['Random Forest'] = rf
     
     # Train Decision Tree
     print("Training Decision Tree...")
     dt = DecisionTreeModel()
-    dt.train(prep_data['X_train'], prep_data['y_train'])
-    dt_pred = dt.predict(prep_data['X_test'])
+    dt.train(prep_data['scaled_X_train'], prep_data['y_train'])
+    dt_pred = dt.predict(prep_data['scaled_X_test'])
     results['Decision Tree'] = calculate_metrics(prep_data['y_test'], dt_pred)
     models['Decision Tree'] = dt
     
@@ -196,8 +202,8 @@ def example_4_compare_models():
     print(comparison_df.to_string())
     
     # Find best model
-    best_model = comparison_df['f1'].idxmax()
-    print(f"\n✓ Best Model: {best_model} (F1-Score: {comparison_df.loc[best_model, 'f1']:.4f})")
+    best_model = comparison_df['f1_score'].idxmax()
+    print(f"\n[OK] Best Model: {best_model} (F1-Score: {comparison_df.loc[best_model, 'f1_score']:.4f})")
 
 
 if __name__ == "__main__":
@@ -230,11 +236,11 @@ if __name__ == "__main__":
             example_4_compare_models()
         
         print("\n" + "="*70)
-        print("✓ Examples completed successfully!")
+        print("[OK] Examples completed successfully!")
         print("="*70 + "\n")
     
     except Exception as e:
-        print(f"\n❌ Error: {str(e)}")
+        print(f"\n[ERROR] {str(e)}")
         print("\nTroubleshooting tips:")
         print("1. Ensure you're in the project root directory")
         print("2. Check that dataset/dataset_diabet.csv exists")
