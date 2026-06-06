@@ -1,12 +1,14 @@
-# Byte-compiled / optimized / DLL files
+# ============================================
+# Python Byte-compiled / optimized / DLL files
+# ============================================
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
 
+# ============================================
 # Distribution / packaging
+# ============================================
 .Python
 build/
 develop-eggs/
@@ -27,22 +29,32 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# ============================================
 # PyInstaller
+# ============================================
 *.manifest
 *.spec
 
+# ============================================
 # Jupyter Notebook
+# ============================================
 .ipynb_checkpoints
-*.ipynb
+# *.ipynb  # Décommente cette ligne si tu ne veux PAS versionner tes notebooks
 
+# ============================================
 # IPython
+# ============================================
 profile_default/
 ipython_config.py
 
+# ============================================
 # pyenv
+# ============================================
 .python-version
 
-# Environments
+# ============================================
+# Environment variables & Virtual environments
+# ============================================
 .env
 .venv
 env/
@@ -51,19 +63,143 @@ ENV/
 env.bak/
 venv.bak/
 
-# IDEs
+# ============================================
+# IDEs and Editors
+# ============================================
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
-.DS_Store
+.project
+.pydevproject
+.settings/
 
-# OS
+# ============================================
+# OS generated files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Project specific
-results/
+# ============================================
+# Machine Learning Project Specific
+# ============================================
+# Trained models (too large for GitHub)
 *.pkl
 *.joblib
-*.csv
+*.h5
+*.pb
+*.onnx
+
+# Large data files (keep only small samples)
+# *.csv  # Commenté pour permettre de versionner dataset_diabet.csv
+*.parquet
+*.feather
+*.npy
+*.npz
+
+# Results and outputs (regenerated during training)
+results/*.pkl
+results/*.joblib
+results/*.csv
+results/*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Logs
+*.log
+logs/
+
+# TensorBoard logs
+runs/
+events.out.tfevents.*
+
+# ============================================
+# Documentation builds
+# ============================================
+docs/_build/
+
+# ============================================
+# Spyder project settings
+# ============================================
+.spyderproject
+.spyproject/
+
+# ============================================
+# Rope project settings
+# ============================================
+.ropeproject
+
+# ============================================
+# mkdocs documentation
+# ============================================
+/site
+
+# ============================================
+# mypy
+# ============================================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ============================================
+# Pyre type checker
+# ============================================
+.pyre/
+
+# ============================================
+# Coverage and Testing
+# ============================================
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# ============================================
+# Unit test / coverage reports
+# ============================================
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# ============================================
+# Translations
+# ============================================
+*.mo
+*.pot
+
+# ============================================
+# Sphinx documentation
+# ============================================
+docs/_build/
+
+# ============================================
+# Jupyter Notebook Checkpoints
+# ============================================
+.ipynb_checkpoints/
