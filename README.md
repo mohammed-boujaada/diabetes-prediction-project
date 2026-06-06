@@ -1,8 +1,7 @@
-# Diabetes Prediction Project
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Active-success.svg)]()
+
+```markdown
+# Diabetes Prediction Project
 
 A comprehensive machine learning project for predicting diabetes risk using multiple classification models. This project demonstrates best practices in data preprocessing, model training, evaluation, and visualization.
 
@@ -11,17 +10,17 @@ A comprehensive machine learning project for predicting diabetes risk using mult
 This project was developed as a final year project during my Bachelor's degree in Software Engineering and represents professional-grade machine learning practices. After extensive experimentation with multiple models, **KNN (K-Nearest Neighbors)** and **Random Forest** were identified as the best performing algorithms.
 
 ### Key Features
-- ✅ Comprehensive exploratory data analysis (EDA)
-- ✅ Multiple ML models (KNN, Random Forest, Decision Tree)
-- ✅ Hyperparameter optimization (GridSearchCV)
-- ✅ Detailed performance evaluation and comparison
-- ✅ Professional Jupyter notebooks with clear documentation
-- ✅ Production-ready Python package structure
-- ✅ Visualization and reporting capabilities
+✅ Comprehensive exploratory data analysis (EDA)  
+✅ Multiple ML models (KNN, Random Forest, Decision Tree)  
+✅ Hyperparameter optimization (GridSearchCV)  
+✅ Detailed performance evaluation and comparison  
+✅ Professional Jupyter notebooks with clear documentation  
+✅ Production-ready Python package structure  
+✅ Visualization and reporting capabilities  
 
 ## 📊 Project Structure
 
-```
+```text
 diabetes-prediction-project/
 │
 ├── dataset/
@@ -59,20 +58,19 @@ diabetes-prediction-project/
 
 ## 🎯 Dataset Information
 
-### Dataset: Pima Indians Diabetes Database
+**Dataset:** Pima Indians Diabetes Database  
+**Source:** UCI Machine Learning Repository  
 
-**Source**: UCI Machine Learning Repository
-
-**Characteristics**:
-- **Samples**: 768 records
-- **Features**: 8 clinical measurements
-- **Target**: Binary classification (0: No Diabetes, 1: Diabetes)
-- **Class Distribution**: ~35% positive (diabetic), ~65% negative (non-diabetic)
+### Characteristics
+- **Samples:** 768 records
+- **Features:** 8 clinical measurements
+- **Target:** Binary classification (0: No Diabetes, 1: Diabetes)
+- **Class Distribution:** ~35% positive (diabetic), ~65% negative (non-diabetic)
 
 ### Features
 
 | Feature | Description | Unit |
-|---------|-------------|------|
+|---|---|---|
 | Pregnancies | Number of pregnancies | Count |
 | Glucose | Plasma glucose concentration | mg/dL |
 | BloodPressure | Diastolic blood pressure | mmHg |
@@ -81,62 +79,60 @@ diabetes-prediction-project/
 | BMI | Body mass index | kg/m² |
 | DiabetesPedigreeFunction | Diabetes pedigree function | Score |
 | Age | Age of the individual | Years |
-| **Outcome** | **Diabetes (1) or Not (0)** | **Binary** |
+| Outcome | Diabetes (1) or Not (0) | Binary |
 
 ## 🔧 Installation
 
 ### Prerequisites
 - Python 3.8 or higher
-- pip or conda package manager
+- `pip` or `conda` package manager
 
 ### Setup Instructions
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/yourusername/diabetes-prediction-project.git
-   cd diabetes-prediction-project
-   ```
+**1. Clone the repository**
+```bash
+git clone https://github.com/boujaadamohammed/diabetes-prediction-project.git
+cd diabetes-prediction-project
+```
 
-2. **Create a virtual environment** (recommended)
-   ```bash
-   # Using venv
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   
-   # Or using conda
-   conda create -n diabetes python=3.9
-   conda activate diabetes
-   ```
+**2. Create a virtual environment (recommended)**
+```bash
+# Using venv
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Or using conda
+conda create -n diabetes python=3.9
+conda activate diabetes
+```
 
-4. **Verify installation**
-   ```bash
-   python -c "import pandas; import sklearn; print('Installation successful!')"
-   ```
+**3. Install dependencies**
+```bash
+pip install -r requirements.txt
+```
+
+**4. Verify installation**
+```bash
+python -c "import pandas; import sklearn; print('Installation successful!')"
+```
 
 ## 🚀 Quick Start
 
 ### Running Jupyter Notebooks
-
 ```bash
 # Navigate to project directory
 cd diabetes-prediction-project
 
 # Start Jupyter
 jupyter notebook
-
-# Open the notebooks in order:
-# 1. notebooks/01_data_exploration.ipynb
-# 2. notebooks/02_model_training.ipynb
-# 3. notebooks/03_results_analysis.ipynb
 ```
 
-### Using the Package Programmatically
+Open the notebooks in order:
+1. `notebooks/01_data_exploration.ipynb`
+2. `notebooks/02_model_training.ipynb`
+3. `notebooks/03_results_analysis.ipynb`
 
+### Using the Package Programmatically
 ```python
 import sys
 sys.path.insert(0, 'src')
@@ -164,39 +160,39 @@ print(f"Accuracy: {metrics['accuracy']:.4f}")
 
 ### Models Tested
 
-1. **K-Nearest Neighbors (KNN)**
-   - Simple, effective baseline
-   - Hyperparameter: number of neighbors (k)
-   - Optimization: GridSearchCV with k ∈ [1, 30]
+**K-Nearest Neighbors (KNN)**
+- Simple, effective baseline
+- Hyperparameter: number of neighbors (k)
+- Optimization: GridSearchCV with k ∈ [1, 30]
 
-2. **Random Forest**
-   - Ensemble method
-   - Provides feature importance
-   - Strong generalization
-   - Parameters: 100 estimators, max_depth=10
+**Random Forest**
+- Ensemble method
+- Provides feature importance
+- Strong generalization
+- Parameters: 100 estimators, max_depth=10
 
-3. **Decision Tree**
-   - Interpretable baseline
-   - Fast training and prediction
-   - Parameters: max_depth=10
+**Decision Tree**
+- Interpretable baseline
+- Fast training and prediction
+- Parameters: max_depth=10
 
 ### Performance Comparison
 
 | Model | Accuracy | Precision | Recall | F1-Score | ROC-AUC |
-|-------|----------|-----------|--------|----------|---------|
+|---|---|---|---|---|---|
 | **KNN (Optimized)** | **0.7662** | **0.6923** | **0.5686** | **0.6250** | **0.7435** |
 | Random Forest | 0.7597 | 0.6667 | 0.5686 | 0.6122 | 0.7342 |
 | Decision Tree | 0.7143 | 0.6000 | 0.5098 | 0.5517 | 0.6537 |
 | KNN (k=5) | 0.7273 | 0.6207 | 0.5490 | 0.5816 | 0.7102 |
 
-**Key Finding**: The optimized KNN model (k=16) achieved the best F1-score of 0.6250, balancing precision and recall effectively.
+> **Key Finding:** The optimized KNN model (k=16) achieved the best F1-score of **0.6250**, balancing precision and recall effectively.
 
 ### Feature Importance (Random Forest)
 
 Top 5 most important features:
-1. **Glucose** - 0.2845 (28.5%)
-2. **BMI** - 0.2154 (21.5%)
-3. **DiabetesPedigreeFunction** - 0.1547 (15.5%)
+1. 🥇 **Glucose** - 0.2845 (28.5%)
+2. 🥈 **BMI** - 0.2154 (21.5%)
+3. 🥉 **DiabetesPedigreeFunction** - 0.1547 (15.5%)
 4. **Age** - 0.1421 (14.2%)
 5. **BloodPressure** - 0.0896 (9.0%)
 
@@ -234,15 +230,16 @@ Top 5 most important features:
 ## 🔍 Detailed Usage
 
 ### Making Predictions with Trained Model
-
 ```python
 import pickle
 import pandas as pd
-from data_preprocessing import load_dataset, prepare_features_and_target
 
 # Load the trained model and scaler
 with open('results/knn_optimized.pkl', 'rb') as f:
     model = pickle.load(f)
+
+with open('results/scaler.pkl', 'rb') as f:
+    scaler = pickle.load(f)
 
 # Prepare new patient data
 new_patient = pd.DataFrame({
@@ -256,9 +253,12 @@ new_patient = pd.DataFrame({
     'Age': [45]
 })
 
+# Scale features
+scaled_patient = scaler.transform(new_patient)
+
 # Make prediction
-prediction = model.predict(new_patient)
-probability = model.predict_proba(new_patient)
+prediction = model.predict(scaled_patient)
+probability = model.predict_proba(scaled_patient)
 
 print(f"Prediction: {'Diabetes' if prediction[0] == 1 else 'No Diabetes'}")
 print(f"Probability: {probability[0][1]:.2%}")
@@ -291,22 +291,22 @@ Classes for ML models:
 ## 🎓 Educational Value
 
 This project demonstrates:
-- ✅ Professional Python package structure
-- ✅ Comprehensive data analysis pipeline
-- ✅ Multiple ML algorithms comparison
-- ✅ Hyperparameter optimization techniques
-- ✅ Best practices in model evaluation
-- ✅ Clear documentation and code comments
-- ✅ Reproducible results (fixed random_state)
-- ✅ Visualization best practices
+✅ Professional Python package structure  
+✅ Comprehensive data analysis pipeline  
+✅ Multiple ML algorithms comparison  
+✅ Hyperparameter optimization techniques  
+✅ Best practices in model evaluation  
+✅ Clear documentation and code comments  
+✅ Reproducible results (fixed random_state)  
+✅ Visualization best practices  
 
 ## 💡 Key Insights
 
-1. **Glucose levels** are the strongest predictor of diabetes
-2. **BMI** is the second most important factor
-3. The **optimized KNN model** provides the best balance between precision and recall
-4. Class imbalance (35% positive) doesn't significantly impact model performance
-5. All models achieve **>71% accuracy** on the test set
+- **Glucose** levels are the strongest predictor of diabetes
+- **BMI** is the second most important factor
+- The optimized KNN model provides the best balance between precision and recall
+- Class imbalance (35% positive) doesn't significantly impact model performance
+- All models achieve >71% accuracy on the test set
 
 ## 🔬 Technologies Used
 
@@ -323,21 +323,21 @@ This project demonstrates:
 If you use this project in your research, please cite:
 
 ```bibtex
-@project{diabetes_prediction_2024,
+@project{diabetes_prediction_2026,
   title={Diabetes Prediction Using Machine Learning},
-  author={Your Name},
-  year={2024},
-  url={https://github.com/yourusername/diabetes-prediction-project}
+  author={Boujaada Mohammed},
+  year={2026},
+  url={https://github.com/boujaadamohammed/diabetes-prediction-project}
 }
 ```
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to:
-- Report bugs
-- Suggest improvements
-- Submit pull requests
-- Share insights
+- 🐛 Report bugs
+- 💡 Suggest improvements
+- 🔀 Submit pull requests
+- 📊 Share insights
 
 ## 📄 License
 
@@ -345,16 +345,16 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ## 👨‍🎓 About
 
-**Author**: Your Name  
-**Education**: Master's Student in Artificial Intelligence and Emerging Technologies  
-**Background**: Bachelor's degree in Software Engineering  
-**Original Project**: Final year capstone project
+- **Author:** Boujaada Mohammed
+- **Education:** Master's Student in Artificial Intelligence and Emerging Technologies
+- **Background:** Bachelor's degree in Software Engineering
+- **Original Project:** Final year capstone project
 
 ## 📧 Contact
 
-- Email: your.email@example.com
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn Profile](https://linkedin.com/in/yourprofile)
+- **GitHub:** [@boujaadamohammed](https://github.com/boujaadamohammed)
+- **LinkedIn:** [Boujaada Mohammed](https://www.linkedin.com/in/boujaadamohammed/)
+- **Email:** [Contact me via GitHub](https://github.com/boujaadamohammed)
 
 ## 🙏 Acknowledgments
 
@@ -364,9 +364,10 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ---
 
-**Last Updated**: January 2024  
-**Status**: Active & Maintained  
-**Version**: 1.0.0
+**Last Updated:** June 2026  
+**Status:** ✅ Active & Maintained  
+**Version:** 1.0.0  
 
-⭐ If you found this project useful, please consider giving it a star!
+⭐ **If you found this project useful, please consider giving it a star!**
+```
 
