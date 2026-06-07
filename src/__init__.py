@@ -7,7 +7,7 @@ __version__ = "1.0.0"
 __author__ = "Boujaada Mohammed"
 __email__ = "mohammedboujaada51@gmail.com"
 __description__ = "Machine Learning models for diabetes prediction"
-__license__ = "Gl"
+__license__ = "MIT"
 __url__ = "https://github.com/MohammedBoujaada/diabetes-prediction-project"
 
 # Import main classes for easier access
