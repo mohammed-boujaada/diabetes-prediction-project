@@ -353,7 +353,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 - Scikit-learn for excellent ML libraries
 - The open-source community for tools and inspiration
 
----
+----
 
 **Last Updated:** June 2026  
 **Status:** ✅ Active & Maintained  
