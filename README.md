@@ -1,5 +1,5 @@
 
-```markdown
+
 # 🩺 Diabetes Prediction Project
 
 <div align="center">
